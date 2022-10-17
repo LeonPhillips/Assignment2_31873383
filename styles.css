@@ -1,0 +1,169 @@
+body *{
+    font-family: 'Source Serif 4', serif;
+    font-size: 8;
+  }
+
+p {
+  font-family: 'Source Serif 4',serif;
+  font-size: 5;
+}
+  
+h1 {
+  font-weight: 900;
+  font-family: 'DM Serif Text', serif;
+}
+
+h2 {
+  font-family: 'Source Serif 4', serif;
+
+}
+
+body {
+  background-image: url("Ass2_background.jpg");
+  background-color: #cccccc;
+}
+
+.page {
+  width: 1000px;
+  background-color: #e6ffff;
+  margin: auto;
+  padding: 50px;
+  padding-top: 35px;
+}
+
+.pure-g {
+  margin-bottom: 40px;
+  border-left-style: ridge;
+  border-right-style:ridge;
+  background-color: white;
+}
+
+.text-top-left {
+  padding-right: 20px;
+  text-align: justify;
+  text-justify: inter-word;
+  background-color: white;
+
+}
+
+.text-top-right {
+  padding-left: 20px;
+  text-align: justify;
+  text-justify: inter-word;
+  background-color: white;
+
+}
+
+.donuts_words {
+  text-align: justify;
+  text-justify: inter-word;
+  background-color: white;
+
+}
+
+.title_block{
+  margin-bottom: 40px;
+  text-align: center;
+  border-style:solid;
+  color: black;
+  background-color: lightgrey;
+}
+
+.country_title_block{
+  margin-bottom: 5px;
+  text-align: center;
+  font-size: 20px;
+  font-weight: bold;
+  border-style:solid;
+  background-color: lightgrey;
+
+
+}
+
+.map_bar_class{
+  border-top-style: ridge;
+  border-left-style: ridge;
+  border-right-style: ridge;
+  background-color: white;
+
+}
+
+.country_map_description_class{
+  border-bottom-style: ridge;
+  background-color: white;
+
+}
+
+.other_country_description_class{
+  border-bottom-style: ridge;
+  background-color: white;
+  text-align: right;
+
+}
+
+.time_title_block{
+  margin-bottom: 5px;
+  text-align: center;
+  font-size: 20px;
+  font-weight: bold;
+  border-style:solid;
+  background-color: lightgrey;
+
+}
+
+.time_content_block{
+  border-style:ridge;
+  background-color: white;
+
+}
+
+.time_description{
+  text-align:right;
+  background-color: white;
+
+}
+
+.gdp_title_block{
+  margin-bottom: 5px;
+  text-align: center;
+  font-size: 20px;
+  font-weight: bold;
+  border-style:solid;
+  background-color: lightgrey;
+}
+
+.gdp_content_block{
+  border-style:ridge;
+  background-color: white;
+  margin-left: 30px;
+  margin: 30px;
+
+}
+
+.gdp_vis_block{
+  text-align:right;
+  background-color: white;
+
+}
+
+.gdp_description_class{
+  border-bottom-style:ridge;
+  background-color: white;
+  margin-left: 30px;
+
+}
+
+.gdp_content_class{
+  border-bottom-style: double;
+  background-color: white;
+  margin: 30px;
+
+}
+
+.status1{
+  font-weight:bold;
+}
+
+.status2{
+  font-style: italic;
+}
