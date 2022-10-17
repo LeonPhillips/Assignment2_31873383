@@ -1,0 +1,260 @@
+{
+  "config": {
+      "view": {"stroke": null},
+      "axis": {"grid": false}
+    },
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "data": { "url": "https://raw.githubusercontent.com/LeonPhillips/Assignment-2-pt2/main/worldEnergyconsum_perc_total.csv"},
+  "params":[
+      {
+        "name":"val_select",
+        "value":"percentage",
+        "bind":{
+          "input":"select",
+          "options":["percentage","total_trans"],
+          "labels":["Percentage Share","Total (Terrawatt Hours)"],
+          "name":"Value type: "
+          }
+      },
+      {
+          "name":"year_start",
+          "value":1985,
+          "bind":{
+              "input":"range",
+              "min":1985,
+              "max":2016,
+              "step":1,
+              "name":"From Year: "
+          }
+      }
+    ],
+    "transform":[
+      {"filter":{
+        "field":"country",
+        "equal":"World"
+      }
+      },
+      {
+        "calculate":"datum[val_select]",
+        "as": "chosen_vals"
+      },
+      {"calculate": "substring(toString(datum.chosen_vals),0,4) + ' [% or *100 TW-hr]'", "as":"tt_text"},
+      {"calculate": "datum.total*0.01","as":"total_trans"}
+    ],
+  "vconcat":[
+      {
+          "transform": [
+            {"filter": {
+                "field":"year",
+                "oneOf":["1985","2016"]
+                }
+            },
+            {
+                "filter":{
+                    "field":"country",
+                    "equal":"World"
+                }
+            },
+            {"calculate": "datum.year == '1985' ? 'year_first' : 'year_second'", "as": "year_select"},
+            {"calculate":"datum.year == 1985 ? datum.chosen_vals:datum.chosen_vals", "as":"neg_pos"}
+          ],
+          "spacing": 0,
+          "hconcat": [{
+              "width":230,
+              "height":150,
+            "transform": [{
+              "filter": {"field": "year_select", "equal": "year_first"}
+            }],
+            "title": "1985",
+            "mark": "bar",
+            "encoding": {
+              "y": {
+                "field": "type", "axis": null, "sort": "descending"
+              },
+              "x": {
+                "aggregate": "sum", "field": "neg_pos",
+                "title": "Share [%] / Total Consumed [*100 TW-hr]",
+                "axis": {
+                  "format": "s"
+              },
+              "scale":{"domain":[0,80]},
+                "sort": "descending"
+              },
+              "color": {
+                "field": "type",
+                "scale": {"range": ["#8484AE","#564D4A","#EAB464","#F7AF9D","#439775"]},
+                "legend": null
+              },
+              "tooltip":[
+                  {
+                      "field":"tt_text",
+                      "title":"Share/Total Consumed"
+                  },
+                  {
+                  "field":"year",
+                  "title":"Year"
+                  },
+                  {
+                  "field":"type",
+                  "title":"Energy Source"
+                  }
+              ]
+            }
+          }, {
+            "width": 35,
+            "height":150,
+            "view": {"stroke": null},
+            "mark": {
+              "type": "text",
+              "align": "center"
+            },
+            "encoding": {
+              "y": {"field": "type", "type": "ordinal", "axis": null, "sort": "descending"},
+              "text": {"field": "type", "type": "nominal"}
+            }
+          }, 
+          {
+              "width":230,
+              "height":150,
+            "transform": [{
+              "filter": {"field": "year_select", "equal": "year_second"}
+            }],
+            "title": "2016",
+            "mark": "bar",
+            "encoding": {
+              "y": {
+                "field": "type", "title": null,
+                "axis": null, "sort": "descending"
+              },
+              "x": {
+                "aggregate": "sum", "field": "chosen_vals",
+                "title": "Share [%] / Total Consumed [*100 TW-hr]",
+                "axis": {"format": "s"},
+                "scale":{"domain":[0,80]}
+              },
+              "color": {
+                "field": "type",
+                "legend": null
+              },
+              "tooltip":[
+                  {
+                      "field":"tt_text",
+                      "title":"Share/Total Consumed"
+                  },
+                  {
+                  "field":"year",
+                  "title":"Year"
+                  },
+                  {
+                  "field":"type",
+                  "title":"Energy Source"
+                  }
+              ]
+            }
+          }]
+        },
+        {
+          "width":525,
+          "height":150,
+      "layer":[
+        {
+      
+      
+
+          "transform": [
+              {
+                  "calculate":"year(datum.year)",
+                  "as": "Year_filtered"
+              },
+              {
+                  "filter": "datum.Year_filtered >= year_start"
+              }
+          ],
+          "mark": {
+              "type": "line",
+              "point": true
+          },
+          "encoding": {
+              "x": {
+                  "field": "year",
+                  "title":null
+              },
+              "y": {
+                  "field":"chosen_vals",
+                  "type": "quantitative",
+                  "title": "Share (%) / Total Consumed (TW-hr)"
+              },
+              "color": {
+                  "field": "type", 
+                  "type": "nominal", 
+                  "scale":{
+                      "range":["#8484AE","#564D4A","#EAB464","#F7AF9D","#439775"]
+                  }
+              },
+               "tooltip":[
+                  {
+                      "field":"tt_text",
+                      "title":"Share/Total Consumed"
+                  },
+                  {
+                      "field":"year",
+                      "title":"Year"
+                  },
+                  {
+                      "field":"type",
+                      "title":"Energy Source"
+                  }
+              ]
+          
+      }
+      },
+      {
+        "mark":"rule",
+        "data":{
+          "values":[{
+            "x_coord":"2011",
+            "y_coord":"30",
+            "event":"Fukushima Disaster",
+            "color":"blue"
+          }]
+      },
+      "encoding":{
+        "x":{
+          "field":"x_coord"
+        },
+        "color":{
+          "value":"red"
+        }
+      }
+      },
+      {
+        "mark":{"type":"text","align":"left"},
+        "data":{
+          "values":[{
+            "x_coord":"2011",
+            "y_coord":"30",
+            "event":"Fukushima Disaster",
+            "color":"blue"
+          }]
+      },
+      "encoding":{
+        "x":{
+          "field":"x_coord"
+        },
+        "y":{
+          "value":40
+        },
+        "color":{
+          "value":"red"
+        },
+        "text":{
+          "value":"Fukushima Disaster"
+        }
+      }
+      }
+      ]
+  
+  }
+  ]
+  
+}

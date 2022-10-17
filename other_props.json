@@ -1,0 +1,266 @@
+{
+  "params": [
+      {
+        "name": "Year_selection",
+        "value": 2016,
+        "bind": {
+          "input": "range",
+          "min": 1985,
+          "max": 2016,
+          "step": 1,
+          "name": "Year: "
+        }
+      }
+  ],
+  "vconcat":[
+    {
+      "width":100,
+      "data":{"url":"https://raw.githubusercontent.com/LeonPhillips/Assignment-2-pt2/main/worldEnergyConsum_USA.csv"},
+      "title":{
+        "text":"Effect of GDP",
+        "fontSize":20,
+        "font":"times new roman"
+      },
+      "transform":[
+        {"calculate":"datum.gdp*0.000001", "as": "gdp_tril"},
+            {"calculate":"'USD ' + substring(toString(datum.gdp*0.000000000001),0,4) + ' trillion'", "as":"gdp_text"},
+            {"calculate":"substring(toString(datum.low_carbon_share_elec),0,4) + '%'", "as":"share_perc"},
+            {"calculate":"substring(toString(datum.electricity_generation),0,4) + ' terrawatt-hours'", "as": "elec_gen_text"},
+            {"filter": "datum.year == Year_selection"},
+            {"filter":{
+              "field":"country",
+              "oneOf":["Australia","India","China","United States of America","Canada","Brazil"]
+              }
+            }
+      ],
+      "layer":[
+        {
+          "mark":{"type":"point","size":100},
+          "encoding":{
+            "x":{
+              "field":"gdp_tril",
+              "type":"quantitative",
+              "title":"GDP (USD trillion)"
+            },
+            "y":{
+              "field":"electricity_generation",
+              "type":"quantitative",
+              "title":"Total Consumed (tW-h)"
+            },
+            "shape":{
+              "field":"country",
+              "type":"nominal",
+              "legend":{
+                "title":"Country"
+              }
+            },
+            "tooltip": [
+              {"field": "country", "type": "nominal", "title": "Country"},
+              {
+                "field": "elec_gen_text",
+                "title": "Electricity Generated"
+              },
+              {
+                  "field":"gdp_text",
+                  "title": "GDP"
+              }
+          ]
+          }
+        },
+        {
+          "mark":{"type":"line","color":"firebrick"},
+          "transform":[
+            {
+              "regression":"electricity_generation",
+              "on":"gdp_tril"
+            }
+          ],
+          "encoding":{
+            "x":{
+              "field":"gdp_tril",
+              "type":"quantitative"
+            },
+            "y":{
+              "field":"electricity_generation",
+              "type":"quantitative"
+            }
+          }
+        },
+          {
+        "transform": [
+          {
+            "regression": "electricity_generation",
+            "on": "gdp",
+            "params": true
+          },
+          {"calculate": "'R²: '+format(datum.rSquared, '.2f')", "as": "R2"}
+        ],
+        "mark": {
+          "type": "text",
+          "color": "firebrick",
+          "x": "width",
+          "align": "right",
+          "y": -5
+        },
+        "encoding": {
+          "text": {"type": "nominal", "field": "R2"}
+        }
+      }
+        
+        
+      ]
+    },
+    {
+      "data": {"url": "https://raw.githubusercontent.com/LeonPhillips/Assignment-2-pt2/main/gdp_and_types.csv"},
+      "transform": [
+        {"calculate": "datum.gdp > 1000000000 ? 'rich1':'Very Poor'", "as":"gdp_select1"},
+        {"calculate":"datum.gdp > 10000000000 ? 'rich2':'Poor'", "as":"gdp_select2"},
+        {"calculate":"datum.gdp > 100000000000 ? 'rich3':'Middle'", "as":"gdp_select3"},
+        {"calculate":"datum.gdp > 1000000000000 ? 'Very Rich':'Rich'", "as":"gdp_select4"},
+        {"filter": "datum.year == Year_selection"}
+        
+      ],
+      "width":"container",
+      "spacing":0,
+      "hconcat":[
+        {
+        "mark": "rect",
+        "transform":[
+          {"filter":{
+            "field":"gdp_select1",
+            "equal":"Very Poor"
+          }}
+        ],
+        "encoding": {
+          "y": {"field": "type", "type": "nominal","title":null},
+          "x": {"field":"gdp_select1","title":null},
+          "color": {"aggregate": "mean", "field": "percentage"},
+          "tooltip":[
+            {
+              "title":"GDP Status", "field":"gdp_select1"
+            },
+            {
+              "title":"Energy Type","field":"type"
+            },
+            {
+              "aggregate": "mean","title":"Energy Consumed (%)", "field":"percentage", "format":".1f"
+            }
+          ]
+        }
+        
+        },
+    
+        {
+        "mark": "rect",
+        "transform":[
+          {"filter":{
+            "field":"gdp_select2",
+            "equal":"Poor"
+          }}
+        ],
+        "encoding": {
+          "y": {"field": "type", "type": "nominal","title":null,"axis":null},
+          "x": {"field":"gdp_select2","title":null},
+          "color": {"aggregate": "mean", "field": "percentage"},
+          "tooltip":[
+            {
+              "title":"GDP Status", "field":"gdp_select2"
+            },
+            {
+              "title":"Energy Type","field":"type"
+            },
+            {
+              "aggregate": "mean","title":"Energy Consumed (%)", "field":"percentage", "format":".1f"
+            }
+          ]
+        }
+        },
+    
+        {
+        "mark": "rect",
+        "transform":[
+          {"filter":{
+            "field":"gdp_select3",
+            "equal":"Middle"
+          }}
+        ],
+        "encoding": {
+          "y": {"field": "type", "type": "nominal","title":null,"axis":null},
+          "x": {"field":"gdp_select3","title":null},
+          "color": {"aggregate": "mean", "field": "percentage"},
+          "tooltip":[
+            {
+              "title":"GDP Status", "field":"gdp_select3"
+            },
+            {
+              "title":"Energy Type","field":"type"
+            },
+            {
+              "aggregate": "mean","title":"Energy Consumed (%)", "field":"percentage", "format":".1f"
+            }
+          ]
+        }
+        },
+    
+        {
+        "mark": "rect",
+        "transform":[
+          {"filter":{
+            "field":"gdp_select4",
+            "equal":"Rich"
+          }}
+        ],
+        "encoding": {
+          "y": {"field": "type", "type": "nominal","title":null,"axis":null},
+          "x": {"field":"gdp_select4","title":null},
+          "color": {"aggregate": "mean", "field": "percentage"},
+          "tooltip":[
+            {
+              "title":"GDP Status", "field":"gdp_select4"
+            },
+            {
+              "title":"Energy Type","field":"type"
+            },
+            {
+              "aggregate": "mean","title":"Energy Consumed (%)", "field":"percentage", "format":".1f"
+            }
+          ]
+    
+        }
+        },
+    
+        {
+        "mark": "rect",
+        "transform":[
+          {"filter":{
+            "field":"gdp_select4",
+            "equal":"Very Rich"
+          }}
+        ],
+        "encoding": {
+          "y": {"field": "type", "type": "nominal","title":null,"axis":null},
+          "x": {"field":"gdp_select4","title":null},
+          "color": {"aggregate": "mean", "field": "percentage", "scale": {"range": ["#00CC00","#99CCFF"],"domain":[0,100]}, 
+        "legend":{
+          "orient":"none", "legendX":150,"legendY":240,"title":"Energy Consumed (%)","width":10
+        }},
+          "tooltip":[
+            {
+              "title":"GDP Status", "field":"gdp_select4"
+            },
+            {
+              "title":"Energy Type","field":"type"
+            },
+            {
+              "aggregate": "mean","title":"Energy Consumed (%)", "field":"percentage", "format":".1f"
+            }
+          ]
+        }
+        }
+        
+      ]
+    }
+    
+
+  ]
+}

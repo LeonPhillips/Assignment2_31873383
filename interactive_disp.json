@@ -1,0 +1,309 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "params": [
+    {
+      "name": "Year_selection",
+      "value": 2016,
+      "bind": {
+        "input": "range",
+        "min": 1985,
+        "max": 2016,
+        "step": 1,
+        "name": "Year: "
+      }
+    },
+    {
+      "name": "zoom_level",
+      "value": 100,
+      "bind": {
+        "input": "range",
+        "min": 100,
+        "max": 500,
+        "step": 1,
+        "name": "Zoom: "
+      }
+    },
+    {
+      "name": "pan_hor",
+      "value": 275,
+      "bind": {
+        "input": "range",
+        "min": -250,
+        "max": 600,
+        "step": 1,
+        "name": "Pan Horizontally: "
+      }
+    },
+    {
+      "name": "pan_ver",
+      "value": 200,
+      "bind": {
+        "input": "range",
+        "min": 100,
+        "max": 500,
+        "step": 1,
+        "name": "Pan Vertically: "
+      }
+    }
+  ],
+  "hconcat": [
+    {
+      "width": 550,
+      "height": 400,
+      "title": {
+        "text": "% Energy Consumed from 'Low Carbon' Sources",
+        "align": "center",
+        "fontSize": 20,
+        "font": "times new roman"
+      },
+      "projection": {
+        "type": "equalEarth",
+        "scale": {"expr": "zoom_level"},
+        "translate": {"expr": "[pan_hor,pan_ver]"}
+      },
+      "data": {
+        "url": "https://raw.githubusercontent.com/LeonPhillips/Assignment-2-pt2/main/ne_110m%20(1).json",
+        "format": {"type": "topojson", "feature": "ne_110m_admin_0_countries"}
+      },
+      "layer": [
+        {
+          "data": {
+            "url": "https://raw.githubusercontent.com/FIT3179/Vega-Lite/main/7_others/oceans.topojson",
+            "format": {"type": "topojson", "feature": "oceans"}
+          },
+          "mark": {"type": "geoshape", "fill": "skyblue"}
+        },
+        {
+          "transform": [
+            {
+              "calculate": "'Data is not available in ' + datum.properties.NAME",
+              "as": "note"
+            }
+          ],
+          "mark": {"type": "geoshape", "fill": "lightgray", "stroke": "white"},
+          "encoding": {"tooltip": {"field": "note"}}
+        },
+        {
+          "data": {
+            "url": "https://raw.githubusercontent.com/LeonPhillips/Assignment-2/main/ne_110m%20(1).json",
+            "format": {"type": "topojson", "feature": "ne_110m_graticules_30"}
+          },
+          "mark": {"type": "geoshape", "fill": null, "stroke": "lightgrey"}
+        },
+        {
+          "data": {
+            "url": "https://raw.githubusercontent.com/LeonPhillips/Assignment-2-pt2/main/worldEnergyConsum_USA.csv"
+          },
+          "transform": [
+            {
+              "lookup": "country",
+              "from": {
+                "data": {
+                  "url": "https://raw.githubusercontent.com/LeonPhillips/Assignment-2/main/ne_110m%20(1).json",
+                  "format": {
+                    "type": "topojson",
+                    "feature": "ne_110m_admin_0_countries"
+                  }
+                },
+                "key": "properties.NAME"
+              },
+              "as": "geo"
+            },
+            {"filter": "datum.year == Year_selection"},
+            {"calculate":"substring(toString(datum.low_carbon_share_elec),0,4) + '%'", "as":"share_perc_text"}
+          ],
+          "mark": {"type": "geoshape", "stroke": "white"},
+          "encoding": {
+            "shape": {"field": "geo", "type": "geojson"},
+            "color": {
+              "field": "low_carbon_share_elec",
+              "title": "% Share - Low Carbon Sources",
+              "type": "quantitative",
+              "scale": {"range": ["#e71010", "#ffff4c"],"domain":[0,100]},
+              "legend": {
+                "direction": "horizontal",
+                "orient": "top",
+                "gradientLength": 550,
+                "title": null
+              }
+            },
+            "tooltip": [
+              {"field": "country", "type": "nominal", "title": "Country"},
+              {
+                "field": "share_perc_text",
+                "title": "Share in Low Carbon Sources"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {"vconcat":[
+      {
+      "data": {
+        "url": "https://raw.githubusercontent.com/LeonPhillips/Assignment-2-pt2/main/worldEnergyconsum_stacked_bar_3.csv"
+      },
+      "height": 100,
+      "width": 372,
+      "title":{
+        "text":"Different Energy Sources",
+        "fontSize":20,
+        "dy":-12,
+        "font":"times new roman"
+      },
+      "layer": [
+        {
+          "mark": "bar",
+          "transform": [
+            {"filter": "datum.year == Year_selection"},
+            {"filter": {
+              "field": "country",
+              "oneOf":["Africa","Asia Pacific","Europe","North America","South & Central America"]
+            }
+          },
+          {"calculate":"substring(toString(datum.percentage),0,4) + '%'", "as":"share_perc_text"}
+
+        
+        ],
+          "encoding": {
+            "x": {
+              "field": "country",
+              "type": "ordinal",
+              "title": null
+            },
+            "y": {
+              "field": "percentage",
+              "type": "quantitative",
+              "title": "Energy Consumed (%)"
+            },
+            "color": {
+              "field": "type",
+              "type": "nominal",
+              "scale": {
+                "range": ["#8484AE","#564D4A","#EAB464","#F7AF9D","#439775"]
+              },
+              "title": "Energy Type",
+              "legend":null
+            },
+            "tooltip": [
+              {"field": "type", "type": "nominal", "title": "Energy Type: "},
+              {
+                "field": "share_perc_text",
+                "title": "Energy Consumed: "
+              }
+            ]
+          }
+        },
+        {
+          "mark": {"type": "text", "fontSize": 10, "dy": 10, "fill": "white"},
+          "transform": [
+            {"filter": "datum.year == Year_selection"},
+            {"filter": "datum.type == 'renewables'"},
+            {"filter": {
+              "field": "country",
+              "oneOf":["Africa","Asia Pacific","Europe","North America","South & Central America"]
+            }
+          },
+          {"calculate":"substring(toString(datum.percentage),0,4) + '%'", "as":"share_perc_text"}
+
+          ],
+          "encoding": {
+            "x": {
+              "field": "country",
+              "type": "ordinal",
+              "title": "Continent/Region"
+            },
+            "y": {
+              "field": "percentage",
+              "type": "quantitative",
+              "title": "Energy Consumed (%)"
+            },
+            "text": {
+              "field": "share_perc_text"
+
+            }
+          }
+        }
+      ]
+    },
+
+      {
+        "data":{"url":"https://raw.githubusercontent.com/LeonPhillips/Assignment-2-pt2/main/worldEnergyconsum_stacked_bar_3.csv"},
+        "height":140,
+        "width":335,
+        "title":{
+          "text":"World Energy Sources",
+          "fontSize":20,
+          "font":"times new roman"
+        },
+        "layer":[
+          {
+            "mark":{"type":"arc","innerRadius":30},
+            "transform": [
+              {"filter": "datum.year == Year_selection"},
+              {"filter":{
+                "field":"country",
+                "equal":"World"
+                }
+              },
+              {"calculate":"substring(toString(datum.percentage),0,4) + '%'", "as":"share_perc_text"}
+            ],
+            "encoding":{
+              "theta":{
+                "field":"percentage",
+                "type":"quantitative",
+                "title":"low carbon share"
+              },
+              "color":{
+                "field":"type",
+                "type":"nominal",
+                "title":"Energy Type"
+              },
+              "tooltip":[
+                {"field":"type","type":"nominal","title":"Energy Type: "},
+                {"field":"share_perc_text","title":"Energy Consumed: "}
+              ]
+            }
+          },
+          {
+            "mark": {"type": "text", "radius":48,"fontSize": 10, "fill": "white"},
+            "transform": [
+              {"filter": "datum.year == Year_selection"},
+              {"filter":{
+                "field":"country",
+                "equal":"World"
+                }
+              },
+              {"calculate":"substring(toString(datum.percentage),0,4) + '%'", "as":"share_perc_text"}
+            ],
+  
+            
+            "encoding":{
+              "theta":{
+                "field":"percentage",
+                "type":"quantitative",
+                "title":"low carbon share",
+                "stack":true
+                
+              },
+              "color":{
+                "field":"type",
+                "type":"nominal",
+                "title":"Energy Type"
+              },
+              "text": {
+                "field": "type",
+                "type": "nominal"
+              }
+            }
+          }
+          
+        ]
+      }
+
+
+    ]
+    }
+  ],
+  "config": {}
+}
